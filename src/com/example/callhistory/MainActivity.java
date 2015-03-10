@@ -9,7 +9,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.util.Log;
@@ -138,12 +137,12 @@ public class MainActivity extends Activity {
 		  if (convertView == null || convertView.getTag() == null) {
 		   holder = new ViewHolder();
 		   convertView = mInflater.inflate(R.layout.list_row, null);
-		    
-		   holder.callnumber = (TextView) convertView.findViewById(R.id.callNumber_tv);
-		   holder.calltype = (TextView) convertView.findViewById(R.id.callType_tv);
+		   
+		   holder.calltype = (ImageView) convertView.findViewById(R.id.call_logo_imageView);
+		   holder.callnumber = (TextView) convertView.findViewById(R.id.callNumber_tv); 		   
 		   holder.calldate = (TextView) convertView.findViewById(R.id.callDate_tv);
-		   holder.callduration = (TextView) convertView.findViewById(R.id.callDuration_tv);
-		   holder.addComment = (TextView) convertView.findViewById(R.id.addComment_tv);
+		  // holder.callduration = (TextView) convertView.findViewById(R.id.callDuration_tv);
+		   holder.heading = (TextView) convertView.findViewById(R.id.heading_tv);
 		   holder.addImage = (ImageView) convertView.findViewById(R.id.add_comment_imageView);
 		         convertView.setTag(holder);
 		  }
@@ -155,20 +154,34 @@ public class MainActivity extends Activity {
 		  final String callnumber=calldatalist.getCallnumber();
 		  String calltype=calldatalist.getCalltype();
 		  Date calldate= calldatalist.getCalldatetime();
-		  String callduration=calldatalist.getCallduration();
+		  //String callduration=calldatalist.getCallduration();
 		  
 		  if(calltype == "INCOMING"){
-			  holder.calltype.setTextColor(Color.GREEN);
+			  holder.calltype.setImageResource(R.drawable.incoming);
 		  }if(calltype == "OUTGOING"){
-			  holder.calltype.setTextColor(Color.BLUE);
+			  holder.calltype.setImageResource(R.drawable.outgoing);
 		  }if(calltype == "MISSED"){
-			  holder.calltype.setTextColor(Color.RED);
+			  holder.calltype.setImageResource(R.drawable.missed);
 		  }
 		   
 		  holder.callnumber.setText(callnumber);
-		  holder.calltype.setText(calltype);
+		 // holder.calltype.setText(calltype);
 		  holder.calldate.setText(String.valueOf(calldate));
-		  holder.callduration.setText(callduration+" sec");
+		  //holder.callduration.setText(callduration+" sec");
+		  
+		  _comm = dbHandler.getComment(callnumber);
+		  _heading = dbHandler.getHeading(callnumber);
+		  if(null != _heading){
+			  holder.heading.setText(_heading);
+			  holder.addImage.setVisibility(View.GONE);
+			  holder.heading.setVisibility(View.VISIBLE);
+			  
+		  }else{
+			  holder.heading.setVisibility(View.GONE);
+			  holder.addImage.setVisibility(View.VISIBLE);
+		  }
+		  
+		  holder.heading.setText(_heading);
 		  
 		  holder.addImage.setOnClickListener(new OnClickListener() {
 			
@@ -180,14 +193,14 @@ public class MainActivity extends Activity {
 			}
 		});
 		  
-		  holder.addComment.setOnClickListener(new OnClickListener() {
+		  holder.heading.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				String number = listdata.get(position).getCallnumber();
 				
-				updateCommentDialog(number, _heading = dbHandler.getHeading(callnumber), dbHandler.getComment(callnumber));
+				updateCommentDialog(number, dbHandler.getHeading(callnumber), dbHandler.getComment(callnumber));
 			}
 
 			private void updateCommentDialog(String number, String head, String comme) {
@@ -196,7 +209,7 @@ public class MainActivity extends Activity {
 				LayoutInflater inflator = LayoutInflater.from(context);
 				View commentView = inflator.inflate(R.layout.comment_layout, null);
 				
-				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+				final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
 				alertDialogBuilder.setTitle("Add Comment");
 				alertDialogBuilder.setCancelable(false);
@@ -217,15 +230,19 @@ public class MainActivity extends Activity {
 				  String comment = comment_edt.getText().toString();
 				  // Do something with values!
 				 // Inserting Contacts
-			      Log.d("Insert: ", "Inserting .."); 
-				  //dbHandler.addContact(new Contact(name, _phoneNumber, heading, comment));
+			      
 			      if(heading.length() > 5){
 			    	  
 			    	  if(heading.length() < 16){
 			    		  
+			    		  if(null != dbHandler.getHeading(_phoneNumber)){
+			    			  
+			    			  Log.d("Insert: ", "Updating .."); 
+			    		  
 					    	  dbHandler.updateComment(_phoneNumber, heading, comment);
-					    	  _heading = null;
+					    	  //_heading = null;
 					    	  notifyDataSetChanged();
+			    		  }
 			    	  }else{
 			    		  Toast.makeText(getApplicationContext(), "Heading shouldn't exceed 15 charcaters!", Toast.LENGTH_LONG).show();
 			    	  }
@@ -250,18 +267,6 @@ public class MainActivity extends Activity {
 				alertDialog.show();
 			}
 		});
-		  
-		  _comm = dbHandler.getComment(callnumber);
-		  _heading = dbHandler.getHeading(callnumber);
-		  if(null != _heading){
-			  holder.addComment.setText(_heading);
-			  holder.addImage.setVisibility(View.GONE);
-			  holder.addComment.setVisibility(View.VISIBLE);
-			  
-		  }else{
-			  holder.addComment.setVisibility(View.GONE);
-			  holder.addImage.setVisibility(View.VISIBLE);
-		  }
 		  
 		  return convertView;
 		 }
@@ -293,18 +298,15 @@ public class MainActivity extends Activity {
 			  String comment = comment_edt.getText().toString();
 			  // Do something with values!
 			 // Inserting Contacts
-		      Log.d("Insert: ", "Inserting .."); 
-			  //dbHandler.addContact(new Contact(name, _phoneNumber, heading, comment));
+		      
 		      if(heading.length() > 5){
 		    	  
 		    	  if(heading.length() < 16){
 		    		  
 				      if(null == dbHandler.getHeading(_phoneNumber)){
 				    	  
-//				    	  dbHandler.updateComment(_phoneNumber, heading, comment);
-//				    	  _heading = null;
-//				      }else{
-				    	  
+				    	  Log.d("Insert: ", "Inserting .."); 
+
 				    	  dbHandler.addContact(_phoneNumber, heading, comment); 
 				    	  notifyDataSetChanged();
 				      }
@@ -336,8 +338,8 @@ public class MainActivity extends Activity {
 	 
 	 private static class ViewHolder {
 		 
-	     public TextView callnumber, calltype, calldate, callduration, addComment;
-	     public ImageView addImage;
+	     public TextView callnumber, calldate, callduration, heading;
+	     public ImageView addImage, calltype;
 	 }
 
  
