@@ -5,9 +5,9 @@ import java.util.Date;
 
 public class CallData implements Serializable{
 	
-	private String calltype;
+	private String calltype, contactname;
 	 private String callnumber;
-	 private Date calldatetime;
+	 private String calldatetime;
 	 private String callduration;
 	 private String satatus;
 	 
@@ -16,12 +16,13 @@ public class CallData implements Serializable{
 	   
 	 }
 	  
-	 public CallData(String calltype, String callnumber, Date calldatetime, String callduration)
+	 public CallData(String calltype, String callnumber, String contactName, String callDateTime, String callDuration)
 	 {
-	  this.calldatetime=calldatetime;
-	  this.callduration=callduration;
+	  this.calldatetime=callDateTime;
+	  this.callduration=callDuration;
 	  this.callnumber=callnumber;
 	  this.calltype=calltype;
+	  this.contactname = contactName;
 	 }
 	 
 	 public String getCalltype() {
@@ -40,11 +41,19 @@ public class CallData implements Serializable{
 	  this.callnumber = callnumber;
 	 }
 	 
-	 public Date getCalldatetime() {
+	 public String getContactName(){
+		 return contactname;
+	 }
+	 
+	 public void setContactname(String conName){
+		 this.contactname = conName;
+	 }
+	 
+	 public String getCalldatetime() {
 	  return calldatetime;
 	 }
 	 
-	 public void setCalldatetime(Date calldatetime) {
+	 public void setCalldatetime(String calldatetime) {
 	  this.calldatetime = calldatetime;
 	 }
 	 
@@ -56,5 +65,4 @@ public class CallData implements Serializable{
 	  this.callduration = callduration;
 	 }
 	 
-
 }

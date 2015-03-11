@@ -1,25 +1,33 @@
 package com.example.callhistory;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CallLog;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.PhoneLookup;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,8 +41,9 @@ public class MainActivity extends Activity {
 	    private String phoneNumber = null;
 	    private String callDate = null;
 	    private String callDuration = null;
-	    private Date callDateTime = null;
+	    private String callDateTime = null;
 	    private String _phoneNumber;
+	    private String contactName = null;
 	     
 	    private List<CallData> list=new ArrayList<CallData>();
 	    private Context context=null;
@@ -51,21 +60,74 @@ public class MainActivity extends Activity {
 	  
 	  getCallDetails();
 	  
-	  CustomAdapter adapter=new CustomAdapter(MainActivity.this, list);
+	  final CustomAdapter adapter=new CustomAdapter(MainActivity.this, list);
 	  listview.setAdapter(adapter);
+	  /**
+	   * This item long click listener is used to call the delete dialog and read the number from the selected item
+	   */
+	  listview.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+		@Override
+		public boolean onItemLongClick(AdapterView<?> parent, View view,
+				int position, long id) {
+			// TODO Auto-generated method stub
+			TextView num_tv = (TextView) view.findViewById(R.id.callNumber_tv);
+			//String text = lv.get(position).tostring().trim();//first method
+			String selectedNum = num_tv.getText().toString();//second method
+			deleteCommentDialog(selectedNum);
+			return false;
+		}
+		
+		/**
+		 * This method is used to delete the comment from the database and update the listview of the call register
+		 * @param selectedNum
+		 */
+		private void deleteCommentDialog(final String selectedNum) {
+			// TODO Auto-generated method stub
+			AlertDialog.Builder builder = new AlertDialog.Builder(context);
+	        builder.setCancelable(false);
+	        builder.setMessage("Are you sure, you want to delete comment?");
+	        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+
+	        public void onClick(DialogInterface dialog, int which) {
+	         // How to remove the selected item?
+	        	dbHandler.deleteComment(selectedNum);
+	        	adapter.notifyDataSetChanged();
+	        }
+
+	    });
+	        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					// TODO Auto-generated method stub
+					dialog.cancel();
+				}
+			});
+	        
+	     // create alert dialog
+			AlertDialog alertDialog = builder.create();
+
+			// show it
+			alertDialog.show();
+
+		}
+	});
 	}
 	
+	 /**
+	  * This method is used to get the call history from the calllog and store that data into a collection 	
+	  */
 	 public void getCallDetails()
 	    {
 	        @SuppressWarnings("deprecation")
 	        String sortOrder = String.format("%s limit 100 ", CallLog.Calls.DATE + " DESC");
-	  Cursor managedCursor = managedQuery( CallLog.Calls.CONTENT_URI,null, null,null, sortOrder);
-	      
+	        Cursor managedCursor = managedQuery( CallLog.Calls.CONTENT_URI, null, null, null, sortOrder);
 	        int number = managedCursor.getColumnIndex( CallLog.Calls.NUMBER );
 	        int type = managedCursor.getColumnIndex( CallLog.Calls.TYPE );
 	        int date = managedCursor.getColumnIndex( CallLog.Calls.DATE);
 	        int duration = managedCursor.getColumnIndex( CallLog.Calls.DURATION);
-	          
+ 
 	          
 	        while (managedCursor.moveToNext())
 	        {
@@ -73,8 +135,11 @@ public class MainActivity extends Activity {
 	            phoneNumber = managedCursor.getString(number);
 	            callType = managedCursor.getString(type);
 	            callDate = managedCursor.getString(date);
-	              
-	            callDateTime = new Date(Long.valueOf(callDate));
+	            contactName = getContactname(phoneNumber);  
+	            //callDateTime = new Date(Long.valueOf(callDate));
+	            long seconds=Long.parseLong(callDate);
+	            SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy  hh:mm a");
+	            callDateTime = format1.format(new Date(seconds));
 	              
 	            callDuration = managedCursor.getString(duration);
 	              
@@ -97,20 +162,52 @@ public class MainActivity extends Activity {
 	                   break;
 	                }
 	              
-	            CallData calldata=new CallData(cType, phoneNumber, callDateTime, callDuration);
+	            CallData calldata=new CallData(cType, phoneNumber, contactName, callDateTime, callDuration);
 	            list.add(calldata);
 	        }
 	              
 	        managedCursor.close();
+	        
 	    }
 	 
-	 
-	 @Override
+	 /**
+	  * this method is used to get the contact name by its phone number
+	  * @param phoneNumber2
+	  * @return contact name
+	  */
+	 private String getContactname(String phoneNumber2) {
+		// TODO Auto-generated method stub
+		 ContentResolver cr = context.getContentResolver();
+		    Uri uri = Uri.withAppendedPath(PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+		    Cursor cursor = cr.query(uri, new String[]{PhoneLookup.DISPLAY_NAME}, null, null, null);
+		    if (cursor == null) {
+		        return null;
+		    }
+		    String contactName = null;
+		    if(cursor.moveToFirst()) {
+		        contactName = cursor.getString(cursor.getColumnIndex(PhoneLookup.DISPLAY_NAME));
+		    }
+
+		    if(cursor != null && !cursor.isClosed()) {
+		        cursor.close();
+		    }
+
+		    return contactName;
+	}
+
+	@Override
 	 public void onResume(){
 	     super.onResume();
 	     // put your code here...
 	 }
 	 
+	 
+	 /**
+	  * This Adapter os used to bind the call log collection data to listview 
+	  * and giving the functionality of add comment, update comment and delete comment functionality.
+	  * @author Srikanth
+	  *
+	  */
 	 public class CustomAdapter extends ArrayAdapter<CallData>{
 		 
 		 String _heading, _comm;
@@ -144,6 +241,7 @@ public class MainActivity extends Activity {
 		  // holder.callduration = (TextView) convertView.findViewById(R.id.callDuration_tv);
 		   holder.heading = (TextView) convertView.findViewById(R.id.heading_tv);
 		   holder.addImage = (ImageView) convertView.findViewById(R.id.add_comment_imageView);
+		   holder.commentRrlLayout = (RelativeLayout) convertView.findViewById(R.id.comment_rv);
 		         convertView.setTag(holder);
 		  }
 		  else {
@@ -151,9 +249,11 @@ public class MainActivity extends Activity {
 		  }
 		   
 		  CallData calldatalist=listdata.get(position);
-		  final String callnumber=calldatalist.getCallnumber();
-		  String calltype=calldatalist.getCalltype();
-		  Date calldate= calldatalist.getCalldatetime();
+		  
+		  final String callnumber = calldatalist.getCallnumber();
+		  String contactname = calldatalist.getContactName();
+		  String calltype = calldatalist.getCalltype();
+		  String calldate = calldatalist.getCalldatetime();
 		  //String callduration=calldatalist.getCallduration();
 		  
 		  if(calltype == "INCOMING"){
@@ -164,9 +264,13 @@ public class MainActivity extends Activity {
 			  holder.calltype.setImageResource(R.drawable.missed);
 		  }
 		   
-		  holder.callnumber.setText(callnumber);
+		  if(null != contactname){
+			  holder.callnumber.setText(contactname);
+		  }else{
+			  holder.callnumber.setText(callnumber);
+		  }
 		 // holder.calltype.setText(calltype);
-		  holder.calldate.setText(String.valueOf(calldate));
+		  holder.calldate.setText("Time: " +String.valueOf(calldate));
 		  //holder.callduration.setText(callduration+" sec");
 		  
 		  _comm = dbHandler.getComment(callnumber);
@@ -202,7 +306,7 @@ public class MainActivity extends Activity {
 				
 				updateCommentDialog(number, dbHandler.getHeading(callnumber), dbHandler.getComment(callnumber));
 			}
-
+			
 			private void updateCommentDialog(String number, String head, String comme) {
 				// TODO Auto-generated method stub
 				_phoneNumber = number;
@@ -268,6 +372,8 @@ public class MainActivity extends Activity {
 			}
 		});
 		  
+
+		  
 		  return convertView;
 		 }
 
@@ -330,7 +436,6 @@ public class MainActivity extends Activity {
 			// create alert dialog
 			AlertDialog alertDialog = alertDialogBuilder.create();
 
-
 			alertDialog.show();
 		}
 		  
@@ -340,6 +445,7 @@ public class MainActivity extends Activity {
 		 
 	     public TextView callnumber, calldate, callduration, heading;
 	     public ImageView addImage, calltype;
+	     public RelativeLayout commentRrlLayout;
 	 }
 
  

@@ -9,7 +9,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp" 
         android:layout_marginLeft="10dp">
 
         <RelativeLayout
@@ -31,17 +30,17 @@
                 android:text="callNumber"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="#000000"
-                android:textSize="20dp"
+                android:textSize="17dp"
                 android:layout_marginLeft="5dp" />
 
             <ImageView
                 android:id="@+id/call_logo_imageView"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
                 android:src="@drawable/missed" 
-                android:layout_marginTop="10dp"/>
+                android:layout_marginTop="13dp"/>
 
             <TextView
                 android:id="@+id/callDate_tv"
@@ -51,7 +50,7 @@
                 android:layout_below="@+id/callNumber_tv"
                 android:text="callDate"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="#000000" />
+                android:layout_marginBottom="5dp"/>
 
         </RelativeLayout>
 
@@ -71,6 +70,7 @@
                 android:layout_centerVertical="true"
                 android:gravity="center"
                 android:text="heading"
+                android:textSize="17dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#000000" />
 

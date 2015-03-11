@@ -31,7 +31,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
  
-    // Creating Tables
+    /**
+     * All CRUD(Create, Read, Update, Delete) Operations
+     */
+    
+    /**
+     * Creating Table 
+     */
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_CONTACTS + "("
@@ -57,9 +63,10 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
  
     /**
-     * All CRUD(Create, Read, Update, Delete) Operations
+     * This method is used to get the comment for the ginen number
+     * @param callnumber
+     * @return comment
      */
- 
 	public String getComment(String callnumber) {
 		String comment = null;
 		try{
@@ -85,7 +92,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		
 		
 	}
-
+	/**
+	 * This method is used to return the heading for the given number
+	 * @param callnumber
+	 * @return heading
+	 */
 	public String getHeading(String callnumber) {
 		// TODO Auto-generated method stub
 		String heading = null;
@@ -111,7 +122,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		
 		return heading;
 	}
-
+	
+	/**
+	 * This method is used to update the comment and heading data stored for the given number
+	 * @param _phoneNumber
+	 * @param heading
+	 * @param comment
+	 */
 	public void updateComment(String _phoneNumber, String heading,
 			String comment) {
 		// TODO Auto-generated method stub
@@ -123,7 +140,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         args.clear();
 		
 	}
-
+	
+	/**
+	 * This method is used to store the new comment, heading and phone number in contacts table
+	 * @param _phoneNumber
+	 * @param heading
+	 * @param comment
+	 */
 	public void addContact(String _phoneNumber, String heading, String comment) {
 		// TODO Auto-generated method stub
 		SQLiteDatabase db = this.getWritableDatabase();
@@ -134,6 +157,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	 // Inserting Row
         db.insert(TABLE_CONTACTS, null, args);
         db.close(); // Closing database connection
+	}
+	
+	/**
+	 * This method is used to delete the record from the contacts table bye the given number
+	 * @param selectedNum
+	 */
+	public void deleteComment(String selectedNum) {
+		// TODO Auto-generated method stub
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.execSQL("DELETE FROM " + TABLE_CONTACTS + " WHERE " + KEY_PH_NO + " = '"+ selectedNum + "'");
 	}
 
  
