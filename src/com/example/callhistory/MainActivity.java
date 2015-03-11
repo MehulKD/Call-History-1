@@ -10,11 +10,11 @@ import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CallLog;
-import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -113,7 +114,27 @@ public class MainActivity extends Activity {
 
 		}
 	});
+//	  /**
+//	   * This listener is used to make call to the clicked contact or num from the call history list
+//	   * 
+//	   */
+//	  listview.setOnItemClickListener(new OnItemClickListener() {
+//
+//		@Override
+//		public void onItemClick(AdapterView<?> parent, View view, int position,
+//				long id) {
+//			// TODO Auto-generated method stub
+//			CallData calldatalist=list.get(position);
+//			String callnumber = calldatalist.getCallnumber();
+//			Intent callIntent = new Intent(Intent.ACTION_CALL);
+//		    callIntent.setData(Uri.parse("tel:" + callnumber));
+//		    startActivity(callIntent);
+//		}
+//	});
+	  
 	}
+	
+	
 	
 	 /**
 	  * This method is used to get the call history from the calllog and store that data into a collection 	
@@ -242,6 +263,7 @@ public class MainActivity extends Activity {
 		   holder.heading = (TextView) convertView.findViewById(R.id.heading_tv);
 		   holder.addImage = (ImageView) convertView.findViewById(R.id.add_comment_imageView);
 		   holder.commentRrlLayout = (RelativeLayout) convertView.findViewById(R.id.comment_rv);
+		   holder.numRelLayout = (RelativeLayout) convertView.findViewById(R.id.number_rl);
 		         convertView.setTag(holder);
 		  }
 		  else {
@@ -372,7 +394,17 @@ public class MainActivity extends Activity {
 			}
 		});
 		  
-
+		  holder.numRelLayout.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+				Intent callIntent = new Intent(Intent.ACTION_CALL);
+			    callIntent.setData(Uri.parse("tel:" + callnumber));
+			    startActivity(callIntent);
+			}
+		});
 		  
 		  return convertView;
 		 }
@@ -399,45 +431,47 @@ public class MainActivity extends Activity {
 		
 
 			alertDialogBuilder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int whichButton) {
-			  String heading = heading_edt.getText().toString();
-			  String comment = comment_edt.getText().toString();
-			  // Do something with values!
-			 // Inserting Contacts
-		      
-		      if(heading.length() > 5){
-		    	  
-		    	  if(heading.length() < 16){
-		    		  
-				      if(null == dbHandler.getHeading(_phoneNumber)){
-				    	  
-				    	  Log.d("Insert: ", "Inserting .."); 
-
-				    	  dbHandler.addContact(_phoneNumber, heading, comment); 
-				    	  notifyDataSetChanged();
-				      }
-		    	  }else{
-		    		  Toast.makeText(getApplicationContext(), "Heading shouldn't exceed 15 charcaters!", Toast.LENGTH_LONG).show();
-		    	  }
-		      }else{
-		    	  Toast.makeText(getApplicationContext(), "Heading must contain minimum of 6 characters!", Toast.LENGTH_LONG).show();
-		      }
-			  
-			  }
-			});
-
-			alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			  public void onClick(DialogInterface dialog, int whichButton) {
-			    // Canceled.
-				  dialog.cancel();
-			  }
-			});
 			
-			// create alert dialog
-			AlertDialog alertDialog = alertDialogBuilder.create();
-
-			alertDialog.show();
-		}
+				public void onClick(DialogInterface dialog, int whichButton) {
+					
+				  String heading = heading_edt.getText().toString();
+				  String comment = comment_edt.getText().toString();
+				  // Do something with values!
+				 // Inserting Contacts
+			      
+			      if(heading.length() > 5){
+			    	  
+			    	  if(heading.length() < 16){
+			    		  
+					      if(null == dbHandler.getHeading(_phoneNumber)){
+					    	  
+					    	  Log.d("Insert: ", "Inserting .."); 
+	
+					    	  dbHandler.addContact(_phoneNumber, heading, comment); 
+					    	  notifyDataSetChanged();
+					      }
+			    	  }else{
+			    		  Toast.makeText(getApplicationContext(), "Heading shouldn't exceed 15 charcaters!", Toast.LENGTH_LONG).show();
+			    	  }
+			      }else{
+			    	  Toast.makeText(getApplicationContext(), "Heading must contain minimum of 6 characters!", Toast.LENGTH_LONG).show();
+			      }
+				  
+				  }
+				});
+	
+				alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				  public void onClick(DialogInterface dialog, int whichButton) {
+				    // Canceled.
+					  dialog.cancel();
+				  }
+				});
+				
+				// create alert dialog
+				AlertDialog alertDialog = alertDialogBuilder.create();
+	
+				alertDialog.show();
+			}
 		  
 		}
 	 
@@ -445,8 +479,7 @@ public class MainActivity extends Activity {
 		 
 	     public TextView callnumber, calldate, callduration, heading;
 	     public ImageView addImage, calltype;
-	     public RelativeLayout commentRrlLayout;
+	     public RelativeLayout commentRrlLayout, numRelLayout;
 	 }
-
  
 }
