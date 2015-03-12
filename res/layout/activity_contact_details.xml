@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <RelativeLayout
+        android:id="@+id/contact_nameNum_relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true" 
+        android:background="@drawable/call_details_selector">
+
+        <TextView
+            android:id="@+id/call_contact_name_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="62dp"
+            android:layout_marginTop="10dp"
+            android:text="name" 
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000"
+            android:textSize="17dp"/>
+
+        <ImageView
+            android:id="@+id/call_contact_imageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="14dp"
+            android:src="@drawable/ic_action_call" />
+
+        <TextView
+            android:id="@+id/call_contact_num_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/call_contact_name_tv"
+            android:layout_below="@+id/call_contact_name_tv"
+            android:text="number" />
+
+    </RelativeLayout>
+    <View
+        android:id="@+id/call_contact_line"
+	    android:layout_width="fill_parent"
+	    android:layout_height="0.5dp"
+	    android:background="@android:color/darker_gray"
+	    android:layout_marginLeft="7dp"
+	    android:layout_marginRight="7dp"
+	    android:layout_below="@+id/contact_nameNum_relativeLayout"/>
+    
+    <RelativeLayout
+        android:id="@+id/send_message_relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/call_contact_line"
+        android:background="@drawable/call_details_selector">
+
+        <ImageView
+            android:id="@+id/send_msg_imageView"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="14dp"
+            android:src="@drawable/new_message" />
+
+        <TextView
+            android:id="@+id/Send_message_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="22dp"
+            android:layout_toRightOf="@+id/send_msg_imageView"
+            android:text="Send text message"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000"
+            android:textSize="17dp" />
+
+    </RelativeLayout>
+    
+    <View
+        android:id="@+id/send_msg_line"
+	    android:layout_width="fill_parent"
+	    android:layout_height="0.5dp"
+	    android:background="@android:color/darker_gray"
+	    android:layout_marginLeft="7dp"
+	    android:layout_marginRight="7dp"
+	    android:layout_below="@+id/send_message_relativeLayout"/>
+    
+    <RelativeLayout
+        android:id="@+id/view_contact_relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/send_msg_line"
+        android:background="@drawable/call_details_selector">
+
+        <ImageView
+            android:id="@+id/view_contact_imageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="14dp" />
+
+        <TextView
+            android:id="@+id/view_contact_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@+id/view_contact_imageView"
+            android:text="View contact"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000"
+            android:textSize="17dp" />
+
+    </RelativeLayout>
+    
+    <View
+        android:id="@+id/view_contact_line"
+	    android:layout_width="fill_parent"
+	    android:layout_height="0.5dp"
+	    android:background="@android:color/darker_gray"
+	    android:layout_marginLeft="7dp"
+	    android:layout_marginRight="7dp"
+	    android:layout_below="@+id/view_contact_relativeLayout"/>
+    
+    <RelativeLayout
+        android:id="@+id/del_from_log_relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/view_contact_relativeLayout"
+        android:background="@drawable/call_details_selector">
+
+        <ImageView
+            android:id="@+id/del_from_log_imageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="14dp"
+            android:src="@drawable/ic_action_cancel" />
+
+        <TextView
+            android:id="@+id/del_from_log_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@+id/del_from_log_imageView"
+            android:text="Delete from call log"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000"
+            android:textSize="17dp" />
+
+    </RelativeLayout>
+    
+
+    <View
+        android:id="@+id/del_from_log_line"
+	    android:layout_width="fill_parent"
+	    android:layout_height="0.5dp"
+	    android:background="@android:color/darker_gray"
+	    android:layout_marginLeft="7dp"
+	    android:layout_marginRight="7dp"
+	    android:layout_below="@+id/del_from_log_relativeLayout"/>
+    
+    <RelativeLayout
+        android:id="@+id/add_comment_relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/del_from_log_line"
+        android:background="@drawable/call_details_selector">
+
+        <ImageView
+            android:id="@+id/add_comment_imageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="14dp"
+            android:src="@drawable/comment" />
+
+        <TextView
+            android:id="@+id/add_comment_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@+id/add_comment_imageView"
+            android:text="Add comment"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000"
+            android:textSize="17dp" />
+
+    </RelativeLayout>
+    
+    <View
+        android:id="@+id/add_comment_line"
+	    android:layout_width="fill_parent"
+	    android:layout_height="0.5dp"
+	    android:background="@android:color/darker_gray"
+	    android:layout_marginLeft="7dp"
+	    android:layout_marginRight="7dp"
+	    android:layout_below="@+id/add_comment_relativeLayout"/>
+    
+    <RelativeLayout
+        android:id="@+id/schedule_task_relativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/add_comment_line"
+        android:background="@drawable/call_details_selector">
+
+        <ImageView
+            android:id="@+id/schedule_task_imageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="14dp"
+            android:src="@drawable/ic_action_go_to_today" />
+
+        <TextView
+            android:id="@+id/schedule_task_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@+id/schedule_task_imageView"
+            android:text="Schedule task"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="#000000"
+            android:textSize="17dp" />
+
+    </RelativeLayout>
+    
+    <View
+        android:id="@+id/schedule_task_line"
+	    android:layout_width="fill_parent"
+	    android:layout_height="0.5dp"
+	    android:background="@android:color/darker_gray"
+	    android:layout_marginLeft="7dp"
+	    android:layout_marginRight="7dp"
+	    android:layout_below="@+id/schedule_task_relativeLayout"/>
+    
+
+</RelativeLayout>

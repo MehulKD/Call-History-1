@@ -20,10 +20,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -32,6 +30,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.callhistory.contactdetails.ContactDetailsActivity;
 import com.example.callhistory.database.DatabaseHandler;
 
 
@@ -63,77 +62,9 @@ public class MainActivity extends Activity {
 	  
 	  final CustomAdapter adapter=new CustomAdapter(MainActivity.this, list);
 	  listview.setAdapter(adapter);
-	  /**
-	   * This item long click listener is used to call the delete dialog and read the number from the selected item
-	   */
-	  listview.setOnItemLongClickListener(new OnItemLongClickListener() {
 
-		@Override
-		public boolean onItemLongClick(AdapterView<?> parent, View view,
-				int position, long id) {
-			// TODO Auto-generated method stub
-			TextView num_tv = (TextView) view.findViewById(R.id.callNumber_tv);
-			//String text = lv.get(position).tostring().trim();//first method
-			String selectedNum = num_tv.getText().toString();//second method
-			deleteCommentDialog(selectedNum);
-			return false;
-		}
-		
-		/**
-		 * This method is used to delete the comment from the database and update the listview of the call register
-		 * @param selectedNum
-		 */
-		private void deleteCommentDialog(final String selectedNum) {
-			// TODO Auto-generated method stub
-			AlertDialog.Builder builder = new AlertDialog.Builder(context);
-	        builder.setCancelable(false);
-	        builder.setMessage("Are you sure, you want to delete comment?");
-	        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-
-	        public void onClick(DialogInterface dialog, int which) {
-	         // How to remove the selected item?
-	        	dbHandler.deleteComment(selectedNum);
-	        	adapter.notifyDataSetChanged();
-	        }
-
-	    });
-	        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-				
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					// TODO Auto-generated method stub
-					dialog.cancel();
-				}
-			});
-	        
-	     // create alert dialog
-			AlertDialog alertDialog = builder.create();
-
-			// show it
-			alertDialog.show();
-
-		}
-	});
-//	  /**
-//	   * This listener is used to make call to the clicked contact or num from the call history list
-//	   * 
-//	   */
-//	  listview.setOnItemClickListener(new OnItemClickListener() {
-//
-//		@Override
-//		public void onItemClick(AdapterView<?> parent, View view, int position,
-//				long id) {
-//			// TODO Auto-generated method stub
-//			CallData calldatalist=list.get(position);
-//			String callnumber = calldatalist.getCallnumber();
-//			Intent callIntent = new Intent(Intent.ACTION_CALL);
-//		    callIntent.setData(Uri.parse("tel:" + callnumber));
-//		    startActivity(callIntent);
-//		}
-//	});
 	  
 	}
-	
 	
 	
 	 /**
@@ -261,9 +192,10 @@ public class MainActivity extends Activity {
 		   holder.calldate = (TextView) convertView.findViewById(R.id.callDate_tv);
 		  // holder.callduration = (TextView) convertView.findViewById(R.id.callDuration_tv);
 		   holder.heading = (TextView) convertView.findViewById(R.id.heading_tv);
-		   holder.addImage = (ImageView) convertView.findViewById(R.id.add_comment_imageView);
+		   //holder.addImage = (ImageView) convertView.findViewById(R.id.add_comment_imageView);
 		   holder.commentRrlLayout = (RelativeLayout) convertView.findViewById(R.id.comment_rv);
 		   holder.numRelLayout = (RelativeLayout) convertView.findViewById(R.id.number_rl);
+		   holder.nextImage = (ImageView) convertView.findViewById(R.id.next_imageView);
 		         convertView.setTag(holder);
 		  }
 		  else {
@@ -273,7 +205,7 @@ public class MainActivity extends Activity {
 		  CallData calldatalist=listdata.get(position);
 		  
 		  final String callnumber = calldatalist.getCallnumber();
-		  String contactname = calldatalist.getContactName();
+		  final String contactname = calldatalist.getContactName();
 		  String calltype = calldatalist.getCalltype();
 		  String calldate = calldatalist.getCalldatetime();
 		  //String callduration=calldatalist.getCallduration();
@@ -299,23 +231,27 @@ public class MainActivity extends Activity {
 		  _heading = dbHandler.getHeading(callnumber);
 		  if(null != _heading){
 			  holder.heading.setText(_heading);
-			  holder.addImage.setVisibility(View.GONE);
+			  holder.nextImage.setVisibility(View.GONE);
 			  holder.heading.setVisibility(View.VISIBLE);
 			  
 		  }else{
 			  holder.heading.setVisibility(View.GONE);
-			  holder.addImage.setVisibility(View.VISIBLE);
+			  holder.nextImage.setVisibility(View.VISIBLE);
 		  }
 		  
 		  holder.heading.setText(_heading);
 		  
-		  holder.addImage.setOnClickListener(new OnClickListener() {
+		  holder.nextImage.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				String number = listdata.get(position).getCallnumber();
-				addCommentDialog(number);
+				Intent detailsActInt = new Intent(MainActivity.this, ContactDetailsActivity.class);
+				detailsActInt.putExtra("key_contact_name", contactname);
+				detailsActInt.putExtra("key_contact_number", callnumber);
+				startActivity(detailsActInt);
+				//addCommentDialog(number);
 			}
 		});
 		  
@@ -394,19 +330,76 @@ public class MainActivity extends Activity {
 			}
 		});
 		  
+		  /**
+		   * This listener is used to make call to the clicked contact or num from the call history list
+		   * 
+		   */
 		  holder.numRelLayout.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				
-				Intent callIntent = new Intent(Intent.ACTION_CALL);
-			    callIntent.setData(Uri.parse("tel:" + callnumber));
-			    startActivity(callIntent);
+//				Intent callIntent = new Intent(Intent.ACTION_CALL);
+//			    callIntent.setData(Uri.parse("tel:" + callnumber));
+//			    startActivity(callIntent);
 			}
 		});
 		  
+		  /**
+		   * This long click listener is used to call the delete dialog and read the number from the selected item
+		   */
+		  holder.commentRrlLayout.setOnLongClickListener(new OnLongClickListener() {
+			
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				deleteCommentDialog(callnumber);
+			}
+
+			/**
+			 * This method is used to delete the comment from the database and update the listview of the call register
+			 * @param callnumber
+			 */
+			private void deleteCommentDialog(final String callnumber) {
+				// TODO Auto-generated method stub
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		        builder.setCancelable(false);
+		        builder.setMessage("Are you sure, you want to delete comment?");
+		        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+
+		        public void onClick(DialogInterface dialog, int which) {
+		         // How to remove the selected item?
+		        	dbHandler.deleteComment(callnumber);
+		        	notifyDataSetChanged();
+		        }
+
+		    });
+		        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						dialog.cancel();
+					}
+				});
+		        
+		     // create alert dialog
+				AlertDialog alertDialog = builder.create();
+
+				// show it
+				alertDialog.show();
+			}
+
+			@Override
+			public boolean onLongClick(View v) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+		});
+		  
+		  
 		  return convertView;
+		  
 		 }
 
 		 // this method is used to display the dialog when user clicks on add comment textview in list item
@@ -478,7 +471,7 @@ public class MainActivity extends Activity {
 	 private static class ViewHolder {
 		 
 	     public TextView callnumber, calldate, callduration, heading;
-	     public ImageView addImage, calltype;
+	     public ImageView calltype, nextImage;
 	     public RelativeLayout commentRrlLayout, numRelLayout;
 	 }
  
