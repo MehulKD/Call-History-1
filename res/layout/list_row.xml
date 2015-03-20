@@ -8,8 +8,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp">
+        android:layout_marginLeft="10dp" >
 
         <RelativeLayout
             android:id="@+id/number_rl"
@@ -20,19 +19,6 @@
             android:layout_toLeftOf="@+id/comment_rv"
             android:background="@drawable/selector"
             android:orientation="horizontal" >
-
-            <TextView
-                android:id="@+id/callNumber_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_alignParentTop="true"
-                android:layout_toRightOf="@+id/call_logo_imageView"
-                android:gravity="center"
-                android:text="callNumber"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="#000000"
-                android:textSize="17dp"
-                android:layout_marginLeft="5dp" />
 
             <ImageView
                 android:id="@+id/call_logo_imageView"
@@ -53,35 +39,60 @@
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:layout_marginBottom="5dp"/>
 
+            <TextView
+                android:id="@+id/callNumber_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="14dp"
+                android:layout_toRightOf="@+id/call_logo_imageView"
+                android:gravity="center"
+                android:text="callNumber"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000000"
+                android:textSize="17dp" />
+
+          <!--  <TextView
+                android:id="@+id/heading_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="14dp"
+                android:layout_toRightOf="@+id/callNumber_tv"
+                android:gravity="center"
+                android:text="heading"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="#000000" /> --> 
+
         </RelativeLayout>
+        
 
         <RelativeLayout
             android:id="@+id/comment_rv"
-            android:layout_width="100dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/number_rl"
             android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true" >
-
-            <TextView
-                android:id="@+id/heading_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:gravity="center"
-                android:text="heading"
-                android:textSize="17dp"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#000000" />
+            android:layout_alignParentTop="true" 
+            android:background="@drawable/call_details_selector">
+            
+             <View
+		        android:id="@+id/next_line"
+			    android:layout_width="1dp"
+			    android:layout_height="50dp"
+			    android:background="@android:color/darker_gray"
+			    android:layout_marginLeft="7dp"
+			    android:layout_marginTop="3dp"
+			    android:layout_marginBottom="3dp"
+			    android:layout_alignParentLeft="true"/>
 
             <ImageView
                 android:id="@+id/next_imageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_marginRight="20dp"
                 android:layout_centerVertical="true"
+                android:layout_marginRight="20dp"
                 android:src="@drawable/ic_action_next_item" />
 
         </RelativeLayout>
