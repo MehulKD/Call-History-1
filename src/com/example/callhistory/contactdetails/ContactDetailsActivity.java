@@ -5,23 +5,17 @@ import java.util.StringTokenizer;
 
 import android.app.AlertDialog;
 import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.provider.CallLog;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.PhoneLookup;
-import android.provider.ContactsContract.RawContacts;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -176,17 +170,7 @@ public class ContactDetailsActivity extends ActionBarActivity{
 	    
 	    Cursor c=context.getContentResolver()
 	    		.query(ContactsContract.RawContacts.CONTENT_URI,projection,selection,selectionArgs , null);
-//	    Cursor c = getContentResolver().query(RawContacts.CONTENT_URI,
-//	    	    new String[]{RawContacts._ID},
-//	    	    RawContacts.CONTACT_ID + "=?",
-//	    	    new String[]{String.valueOf(firstContactId)}, null);
-//	    try {
-//	        if (c.moveToFirst()) {
-//	        	rawContact = c.getLong(0);
-//	        }
-//	    } finally {
-//	        c.close();
-//	    }
+
 	    if (c.moveToFirst()) {    
 	        rawContact=c.getInt(c.getColumnIndex(ContactsContract.RawContacts._ID));
 	    }
@@ -294,21 +278,13 @@ public class ContactDetailsActivity extends ActionBarActivity{
 		    		  String note = heading+","+comment;
 		    		  
 		    		  ContentValues contentValues =  new ContentValues();
-		  		      // insert name data
+		  		      // insert note data
 		  		      contentValues.clear();
-		              contentValues.put(ContactsContract.Data.CONTACT_ID, firstContactId);
+		              contentValues.put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId);
 		              contentValues.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE);
 		              contentValues.put(ContactsContract.CommonDataKinds.Note.NOTE, note);
 		              getContentResolver().insert(ContactsContract.Contacts.CONTENT_URI, contentValues);
-		              //Log.d("TC", "Update returned : " + stat);
-		    		  
-//				      if(null == dbHandler.getHeading(_phoneNumber)){
-//				    	  
-//				    	  Log.d("Insert: ", "Inserting .."); 
-//
-//				    	  dbHandler.addContact(_phoneNumber, heading, comment); 
-//				    	  notifyDataSetChanged();
-//				      }
+
 		    	  }else{
 		    		  Toast.makeText(getApplicationContext(), "Heading shouldn't exceed 15 charcaters!", Toast.LENGTH_LONG).show();
 		    	  }
