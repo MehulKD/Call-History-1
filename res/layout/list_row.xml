@@ -17,7 +17,6 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/comment_rv"
-            android:background="@drawable/selector"
             android:orientation="horizontal" >
 
             <ImageView

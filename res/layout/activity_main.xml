@@ -9,27 +9,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="10dp" >
-        
-        <RelativeLayout
-            android:layout_width="60dp"
-            android:layout_height="45dp"
-            android:layout_alignBottom="@+id/dial_close_rl"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_toLeftOf="@+id/dial_overflow_rl"
-            android:layout_toRightOf="@+id/dial_close_rl"
-            android:background="@android:color/holo_green_light" >
-
-            <ImageView
-                android:id="@+id/dialpad_call_imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:src="@android:drawable/ic_menu_call" />
-        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/dial_close_rl"
@@ -71,9 +50,24 @@
                android:src="@drawable/ic_action_person" />
 
         </RelativeLayout>
-        
-        
 
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_toLeftOf="@+id/dial_overflow_rl"
+            android:layout_toRightOf="@+id/dial_close_rl"
+            android:layout_centerVertical="true"
+            android:background="@android:color/holo_green_light" >
+
+            <ImageView
+                android:id="@+id/dialpad_call_imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:src="@android:drawable/ic_menu_call" />
+        </RelativeLayout>
+        
     </RelativeLayout>
     
      <GridView
@@ -90,23 +84,23 @@
           android:id="@+id/dial_num_edt_rl"
           android:layout_width="fill_parent"
           android:layout_height="40dp"
-          android:layout_alignLeft="@+id/gridView1"
           android:layout_above="@+id/gridView1"
           android:layout_marginBottom="20dp"
-          android:layout_marginTop="189dp" >
+          android:layout_marginLeft="20dp" 
+          android:layout_marginTop="10dp">
 
           <EditText
               android:id="@+id/dial_pad_num_editText"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
+              android:layout_alignParentBottom="true"
               android:layout_alignParentLeft="true"
-              android:layout_alignParentTop="true"
-              android:layout_marginRight="10dp"
-              android:layout_marginLeft="15dp"
               android:layout_toLeftOf="@+id/backspace_imageView"
               android:ems="10"
-              android:hint="Enter number" >
+              android:hint="Enter number" 
+              android:layout_marginRight="20dp">
 
+              <requestFocus />
           </EditText>
 
           <ImageView
@@ -114,19 +108,18 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_alignParentRight="true"
-              android:layout_centerVertical="true"
-              android:layout_marginRight="15dp"
+              android:layout_alignTop="@+id/dial_pad_num_editText"
+              android:layout_marginRight="22dp"
               android:src="@drawable/ic_action_backspace" />
-      </RelativeLayout>
 
+      </RelativeLayout>
+      
       <ListView
           android:id="@+id/listView_calldata"
-          android:layout_width="match_parent"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_alignParentLeft="true"
           android:layout_alignParentTop="true" 
           android:layout_above="@+id/dial_num_edt_rl">
-
       </ListView>
 
 </RelativeLayout>
