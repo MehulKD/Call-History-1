@@ -28,8 +28,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.callhistory.contactdetails.ContactDetailsActivity"
-            android:label="Call details"
+        <activity 
+            android:name="com.example.callhistory.contactdetails.ContactDetailsActivity"
+            android:theme="@android:style/Theme.Holo.Light.Dialog.NoActionBar"
             android:parentActivityName=".MainActivity"></activity>
     </application>
 

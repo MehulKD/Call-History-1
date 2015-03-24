@@ -20,13 +20,13 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -47,7 +47,7 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 		private GridView gridView;
 		private TextView grid_num_tv;
 		private EditText phone_num_edt;
-		private RelativeLayout gridView_collapse_rl, dialPad_overflow_rl, dialPad_num_edt_rl;
+		private RelativeLayout gridView_collapse_rl, dialPad_overflow_rl, dialPad_num_edt_rl, home_call_rl;
 		private ImageView dialPad_collapse_iv, backspace_iv;
 		Cursor managedCursor;
 		//private Spinner spinner;
@@ -71,12 +71,14 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 	    private String callDateTime = null;
 	    private String _phoneNumber;
 	    private String contactName = null;
+	    private String call_id = null;
+	    private String edit_contactNumber;
 	    
 	    private List<CallData> list=new ArrayList<CallData>();
 	    public Context context=null;
 	    
 	    protected SwipeActionAdapter mAdapter;
-	    
+	    protected CustomAdapter callListAdapter;
 	    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,15 +86,13 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 	 setContentView(R.layout.activity_main);
 	 context=this;
 	 
-	  hideSoftKeyboard();
-	 
 	  InitializeUI();
 	  
 	  getCallDetails();
 	  
-	  final CustomAdapter adapter=new CustomAdapter(MainActivity.this, list);
+	  callListAdapter=new CustomAdapter(MainActivity.this, list);
 	  
-	  mAdapter = new SwipeActionAdapter(adapter);
+	  mAdapter = new SwipeActionAdapter(callListAdapter);
       mAdapter.setSwipeActionListener(this).setListView(listview);
       //setListAdapter(mAdapter);
 
@@ -109,6 +109,13 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
       gridView.setVisibility(View.VISIBLE);
       
       gridView.setAdapter(new CustomGridAdapter(this, GRID_NUM));
+      
+      edit_contactNumber = getIntent().getStringExtra("edit_contact");
+      
+      if(null != edit_contactNumber){
+    	  phone_num_edt.setText(edit_contactNumber);
+    	  phone_num_edt.setSelection(phone_num_edt.getText().length());
+      }
       
       
       gridView.setOnItemClickListener(new OnItemClickListener() {
@@ -153,7 +160,12 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				// TODO Auto-generated method stub
-				hideSoftKeyboard();
+				//hideSoftKeyboard();
+				if(gridView.getVisibility() != View.VISIBLE){
+					
+					gridView.setVisibility(View.VISIBLE);
+            	  	dialPad_collapse_iv.setImageResource(R.drawable.ic_action_expand);
+				}
 				return true;
 			}
 		});
@@ -172,6 +184,17 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 				
 			}
 		});
+		
+		backspace_iv.setOnLongClickListener(new OnLongClickListener() {
+			
+			@Override
+			public boolean onLongClick(View v) {
+				// TODO Auto-generated method stub
+				phone_num_edt.setText("");
+				return true;
+			}
+		});
+		
 		/**
 		 * This listener is used to hide the keypad when user scrollup the listview
 		 */
@@ -218,20 +241,38 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 				
 			}
 		});
-	}
-	
-	/**
-	 * Hides the soft keyboard
-	 */
-	 private void hideSoftKeyboard() {
-		// TODO Auto-generated method stub
-		 
-		 if(getCurrentFocus()!=null) {
-		        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-		        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-		    }
+		
+		home_call_rl.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if(phone_num_edt.getText().length() != 0){
+					Intent callIntent = new Intent(Intent.ACTION_CALL);
+				    callIntent.setData(Uri.parse("tel:" + phone_num_edt.getText().toString()));
+				    startActivity(callIntent);
+				}else{
+					phone_num_edt.setText(list.get(0).getCallnumber());
+					phone_num_edt.setSelection(phone_num_edt.getText().length());
+				}
+			}
+		});
+		
 		
 	}
+	
+//	/**
+//	 * Hides the soft keyboard
+//	 */
+//	 private void hideSoftKeyboard() {
+//		// TODO Auto-generated method stub
+//		 
+//		 if(getCurrentFocus()!=null) {
+//		        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+//		        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+//		    }
+//		
+//	}
 
 	private void InitializeUI() {
 		// TODO Auto-generated method stub
@@ -242,6 +283,7 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 	     //dialPad_overflow_rl = (RelativeLayout) findViewById(R.id.dial_overflow_rl);
 	     dialPad_collapse_iv = (ImageView) findViewById(R.id.dialpad_collapse_imageView);
 	     backspace_iv = (ImageView) findViewById(R.id.backspace_imageView);
+	     home_call_rl = (RelativeLayout) findViewById(R.id.home_call_rl);
 	     //spinner = (Spinner) findViewById(R.id.spinner1);
 	}
 
@@ -258,6 +300,7 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 	        int type = managedCursor.getColumnIndex( CallLog.Calls.TYPE );
 	        int date = managedCursor.getColumnIndex( CallLog.Calls.DATE);
 	        int duration = managedCursor.getColumnIndex( CallLog.Calls.DURATION);
+	        int id = managedCursor.getColumnIndex(CallLog.Calls._ID);
 	          
 	        while (managedCursor.moveToNext())
 	        {
@@ -266,6 +309,7 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 	            callType = managedCursor.getString(type);
 	            callDate = managedCursor.getString(date);
 	            contactName = getContactname(phoneNumber);  
+	            call_id = managedCursor.getString(id);
 	            //contactId = getContactId(phoneNumber);
 	            
 	            //callDateTime = new Date(Long.valueOf(callDate));
@@ -294,8 +338,9 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 	                   break;
 	                }
 	              
-	            CallData calldata=new CallData(cType, phoneNumber, contactName, callDateTime, callDuration);
+	            CallData calldata=new CallData(cType, phoneNumber, contactName, callDateTime, callDuration, call_id);
 	            list.add(calldata);
+	            
 	        }
 	              
 	       // managedCursor.close();
@@ -330,6 +375,9 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 	@Override
 	 public void onResume(){
 	     super.onResume();
+	     getCallDetails();
+	     //mAdapter.notifyDataSetChanged();
+	     //callListAdapter.notifyDataSetChanged();
 	     // put your code here...
 	 }
 	
@@ -393,7 +441,8 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 		  final String callnumber = calldatalist.getCallnumber();
 		  final String contactname = calldatalist.getContactName();
 		  String calltype = calldatalist.getCalltype();
-		  String calldate = calldatalist.getCalldatetime();
+		  String calldate = calldatalist.getCalldatetime(); 
+		  final String contact_call_id = calldatalist.getCall_ID();
 		  //String callduration=calldatalist.getCallduration();
 		  
 		  if(calltype == "INCOMING"){
@@ -423,31 +472,28 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 				Intent detailsActInt = new Intent(MainActivity.this, ContactDetailsActivity.class);
 				detailsActInt.putExtra("key_contact_name", contactname);
 				detailsActInt.putExtra("key_contact_number", callnumber);
+				detailsActInt.putExtra("key_contact_call_id", contact_call_id);
 				startActivity(detailsActInt);
 				//addCommentDialog(number);
 			}
 		});
 		  
-
-		  
-		  /**
-		   * This listener is used to make call to the clicked contact or num from the call history list
-		   * 
-		   */
-		  holder.numRelLayout.setOnClickListener(new OnClickListener() {
+		  holder.numRelLayout.setOnLongClickListener(new OnLongClickListener() {
 			
 			@Override
-			public void onClick(View v) {
+			public boolean onLongClick(View v) {
 				// TODO Auto-generated method stub
-				
-//				Intent callIntent = new Intent(Intent.ACTION_CALL);
-//			    callIntent.setData(Uri.parse("tel:" + callnumber));
-//			    startActivity(callIntent);
+				String number = listdata.get(position).getCallnumber();
+				Intent detailsActInt = new Intent(MainActivity.this, ContactDetailsActivity.class);
+				detailsActInt.putExtra("key_contact_name", contactname);
+				detailsActInt.putExtra("key_contact_number", callnumber);
+				detailsActInt.putExtra("key_contact_call_id", contact_call_id);
+				startActivity(detailsActInt);
+				return true;
 			}
 		});
-		  
 
-		  
+		  notifyDataSetChanged();
 		  return convertView;
 		  
 		 }
@@ -508,6 +554,5 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
         }
 		
 	}
-	
  
 }

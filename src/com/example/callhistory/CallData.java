@@ -9,19 +9,25 @@ public class CallData implements Serializable{
 	 private String calldatetime;
 	 private String callduration;
 	 private String satatus;
-	 
-	 public CallData()
-	 {
-	   
-	 }
+	 private String callId;
+
 	  
-	 public CallData(String calltype, String callnumber, String contactName, String callDateTime, String callDuration)
+	 public CallData(String calltype, String callnumber, String contactName, String callDateTime, String callDuration, String call_id)
 	 {
 	  this.calldatetime=callDateTime;
 	  this.callduration=callDuration;
 	  this.callnumber=callnumber;
 	  this.calltype=calltype;
 	  this.contactname = contactName;
+	  this.callId = call_id;
+	 }
+	 
+	 public String getCall_ID(){
+		 return callId;
+	 }
+	 
+	 public void setCall_ID(String callid){
+		 this.callId = callid;
 	 }
 	 
 	 public String getCalltype() {
