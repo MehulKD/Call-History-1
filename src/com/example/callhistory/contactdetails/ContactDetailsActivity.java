@@ -159,7 +159,7 @@ public class ContactDetailsActivity extends Activity{
 			ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
 			ClipData clip = ClipData.newPlainText("copied", contactName +"\n" +contactNumber);
 			clipboard.setPrimaryClip(clip);
-			Toast.makeText(getApplicationContext(), "Copied", Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(), "Contact copied", Toast.LENGTH_LONG).show();
 			finish();
 		}
 	});

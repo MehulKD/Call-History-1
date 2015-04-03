@@ -7,14 +7,18 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.provider.ContactsContract.PhoneLookup;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -28,6 +32,7 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -43,13 +48,15 @@ import com.example.callhistory.swipetocall.SwipeDirections;
 
 public class MainActivity extends Activity implements SwipeActionAdapter.SwipeActionListener {
 
+		String paste_clip_data = "";
 		private ListView listview = null;
 		private GridView gridView;
 		private TextView grid_num_tv;
 		private EditText phone_num_edt;
-		private RelativeLayout gridView_collapse_rl, dialPad_overflow_rl, dialPad_num_edt_rl, home_call_rl;
+		private RelativeLayout gridView_collapse_rl, dialPad_people_rl, dialPad_num_edt_rl, home_call_rl;
 		private ImageView dialPad_collapse_iv, backspace_iv;
-		Cursor managedCursor;
+		private Cursor managedCursor;
+		private Button paste_btn;
 		//private Spinner spinner;
 		private ArrayList<String> number = new ArrayList<String>();
 		static final String[] GRID_NUM = new String[] {
@@ -86,27 +93,10 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 	 setContentView(R.layout.activity_main);
 	 context=this;
 	 
-	  InitializeUI();
+	  new LoadCallLogListView().execute();
 	  
-	  getCallDetails();
-	  
-	  callListAdapter=new CustomAdapter(MainActivity.this, list);
-	  
-	  mAdapter = new SwipeActionAdapter(callListAdapter);
-      mAdapter.setSwipeActionListener(this).setListView(listview);
-      //setListAdapter(mAdapter);
-
-      mAdapter.addBackground(SwipeDirections.DIRECTION_FAR_LEFT,R.layout.row_bg_left_far)
-              .addBackground(SwipeDirections.DIRECTION_NORMAL_LEFT,R.layout.row_bg_left)
-              .addBackground(SwipeDirections.DIRECTION_FAR_RIGHT,R.layout.row_bg_right_far)
-              .addBackground(SwipeDirections.DIRECTION_NORMAL_RIGHT,R.layout.row_bg_right);
-      
-	  listview.setAdapter(mAdapter);
-
-      
-      dialPad_num_edt_rl = (RelativeLayout) findViewById(R.id.dial_num_edt_rl);
-      
       gridView.setVisibility(View.VISIBLE);
+      paste_btn.setVisibility(View.GONE);
       
       gridView.setAdapter(new CustomGridAdapter(this, GRID_NUM));
       
@@ -155,6 +145,7 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 			}
 		});
 		
+		
 		phone_num_edt.setOnTouchListener(new OnTouchListener() {
 			
 			@Override
@@ -167,6 +158,40 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
             	  	dialPad_collapse_iv.setImageResource(R.drawable.ic_action_expand);
 				}
 				return true;
+			}
+		});
+		
+		phone_num_edt.setOnLongClickListener(new OnLongClickListener() {
+			
+			@Override
+			public boolean onLongClick(View v) {
+				// TODO Auto-generated method stub
+				ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+				
+				paste_clip_data = clipboard.getText().toString();
+				
+				if (!TextUtils.isEmpty(paste_clip_data) && paste_btn.getVisibility() == View.GONE){
+					
+			    	
+			    	paste_btn.setVisibility(View.VISIBLE);
+			    	
+			    }
+				
+				return true;
+			}
+		});
+		
+		paste_btn.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				
+				if (!TextUtils.isEmpty(paste_clip_data)){
+					
+					phone_num_edt.setText(paste_clip_data);
+					paste_btn.setVisibility(View.GONE);
+				}
 			}
 		});
 		
@@ -241,6 +266,7 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 				
 			}
 		});
+	
 		
 		home_call_rl.setOnClickListener(new OnClickListener() {
 			
@@ -280,11 +306,12 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 		 gridView = (GridView) findViewById(R.id.gridView1);
 	     phone_num_edt = (EditText) findViewById(R.id.dial_pad_num_editText);
 	     gridView_collapse_rl = (RelativeLayout) findViewById(R.id.dial_close_rl);
-	     //dialPad_overflow_rl = (RelativeLayout) findViewById(R.id.dial_overflow_rl);
+	     dialPad_people_rl = (RelativeLayout) findViewById(R.id.dial_people_rl);
 	     dialPad_collapse_iv = (ImageView) findViewById(R.id.dialpad_collapse_imageView);
 	     backspace_iv = (ImageView) findViewById(R.id.backspace_imageView);
 	     home_call_rl = (RelativeLayout) findViewById(R.id.home_call_rl);
-	     //spinner = (Spinner) findViewById(R.id.spinner1);
+	     dialPad_num_edt_rl = (RelativeLayout) findViewById(R.id.dial_num_edt_rl);
+	     paste_btn = (Button) findViewById(R.id.paste_button);
 	}
 
 	
@@ -375,10 +402,7 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 	@Override
 	 public void onResume(){
 	     super.onResume();
-	     getCallDetails();
-	     //mAdapter.notifyDataSetChanged();
-	     //callListAdapter.notifyDataSetChanged();
-	     // put your code here...
+	     
 	 }
 	
 	@Override
@@ -430,10 +454,14 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 		   holder.contactDetails_rl = (RelativeLayout) convertView.findViewById(R.id.comment_rv);
 		   holder.numRelLayout = (RelativeLayout) convertView.findViewById(R.id.number_rl);
 		   holder.nextImage = (ImageView) convertView.findViewById(R.id.next_imageView);
-		         convertView.setTag(holder);
-		  }
-		  else {
+		   
+		         
+		   convertView.setTag(holder);
+		         
+		  }else {
+			  
 		   holder = (ViewHolder) convertView.getTag();
+		   
 		  }
 		   
 		  CallData calldatalist=listdata.get(position);
@@ -490,6 +518,18 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
 				detailsActInt.putExtra("key_contact_call_id", contact_call_id);
 				startActivity(detailsActInt);
 				return true;
+			}
+		});
+		  
+		  holder.numRelLayout.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				String number = listdata.get(position).getCallnumber();
+				Intent callIntent = new Intent(Intent.ACTION_CALL);
+			    callIntent.setData(Uri.parse("tel:" + number));
+			    startActivity(callIntent);
 			}
 		});
 
@@ -554,5 +594,40 @@ public class MainActivity extends Activity implements SwipeActionAdapter.SwipeAc
         }
 		
 	}
+	
+	public class LoadCallLogListView extends AsyncTask<Void, Void, Void>{
+		
+		@Override
+		 protected void onPreExecute() {
+		  // TODO Auto-generated method stub
+			 InitializeUI();
+		 }
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			// TODO Auto-generated method stub
+			 getCallDetails();
+			return null;
+		}
+
+		@Override
+		 protected void onPostExecute(Void result) {
+		  // TODO Auto-generated method stub
+			
+			  callListAdapter=new CustomAdapter(MainActivity.this, list);
+			  mAdapter = new SwipeActionAdapter(callListAdapter);
+		      mAdapter.setSwipeActionListener(MainActivity.this).setListView(listview);
+		      //setListAdapter(mAdapter);
+
+		      mAdapter.addBackground(SwipeDirections.DIRECTION_FAR_LEFT,R.layout.row_bg_left_far)
+		              .addBackground(SwipeDirections.DIRECTION_NORMAL_LEFT,R.layout.row_bg_left)
+		              .addBackground(SwipeDirections.DIRECTION_FAR_RIGHT,R.layout.row_bg_right_far)
+		              .addBackground(SwipeDirections.DIRECTION_NORMAL_RIGHT,R.layout.row_bg_right);
+		      
+			  listview.setAdapter(mAdapter);
+		 }
+
+}
+
  
 }

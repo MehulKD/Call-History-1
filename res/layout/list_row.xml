@@ -17,7 +17,8 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_toLeftOf="@+id/comment_rv"
-            android:orientation="horizontal" >
+            android:orientation="horizontal" 
+            android:background="@drawable/call_details_selector">
 
             <ImageView
                 android:id="@+id/call_logo_imageView"
